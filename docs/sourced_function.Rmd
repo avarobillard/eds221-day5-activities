@@ -1,0 +1,36 @@
+---
+title: "runoff_volumes"
+output: html_document
+date: "2025-08-15"
+---
+```{r}
+library(tidyverse)
+library(here)
+```
+
+```{r}
+# source R script
+source(here::here("src", "storm_runoff.R"))
+```
+
+```{r}
+# estimate stormwater volume
+imp_fractions <- seq(from = 0.6, to = 0.8, by = 0.01)
+
+runoff_volumes <- predict_runoff(imp_fractions, 182)
+
+# bind results into a data frame
+runoff_volumes_df <- data.frame(runoff_volumes)
+```
+
+```{r}
+# create graph
+runoff_graph <- ggplot(data = runoff_volumes_df, aes(x = runoff_volumes, y = imp_fractions)) +
+  geom_point()+
+  geom_line()
+
+runoff_graph
+
+ggsave(here::here("figs", "runoff_graph.png"), height = 5, width = 6)
+```
+
