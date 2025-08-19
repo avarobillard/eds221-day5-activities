@@ -19,19 +19,19 @@ names(us_tilapia_imports)
 dim(us_tilapia_imports)
 
 # reshape data- name column to create and put values from table into (values-to)
-reshaped <- us_tilapia_imports %>% pivot_longer(cols = -country, names_to = "year", values_to = "tilapia_imports" )
+reshaped <- us_tilapia_imports %>% 
+  pivot_longer(cols = '1992':'2018',
+               names_to = "year",
+               values_to = "tilapia_volume_kpounds" ) %>% 
+  mutate(year = as.numeric(year))
 
 # check class of year column
 class(reshaped$year)
 
-# change year column to numeric class
-reshaped <- reshaped %>% 
-  dplyr::mutate(year = as.numeric(year)) 
-
 # find total us tilapia imports by year
 yearly_tilapia_tot <- reshaped %>% 
   dplyr::group_by(year) %>% 
-  dplyr::summarize(annual_total = sum(tilapia_imports, na.rm = TRUE))
+  dplyr::summarize(annual_total = sum(tilapia_volume_kpounds, na.rm = TRUE))
 
 # create plot
 yearly_tilapia_plot <- ggplot(data = yearly_tilapia_tot, aes(x = year, y = annual_total)) +
@@ -46,8 +46,15 @@ yearly_tilapia_plot
 ggsave(here::here("figs", "yearly_tilapia_plot.png"), height = 5, width = 6)
 
 # create subset of imports
-yearly_tilapia_subset <- filter()
+yearly_tilapia_subset <- reshaped %>% 
+  filter(country %in% c("Ecuador", "Honduras", "Costa Rica", "Mexico"))
 
-# create new plot of subsets
+# create graph of total US tilapia imports over time for the four countries
+subset_plot <- ggplot(data = yearly_tilapia_subset, 
+       aes(x = year, y = tilapia_volume_kpounds)) +
+  geom_point(aes(color = country))
+
+# export graph
+ggsave(here::here("figs", "subset_plot.jpg"), height = 5, width = 6)
 ```
 
